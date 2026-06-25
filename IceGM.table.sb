@@ -1,0 +1,28 @@
+#!/bin/bash
+#SBATCH --job-name=iceGrowth_table
+#SBATCH --output=/scratch/user/u.jb337251/PRISMS-PF-3.0/applications/IceGM.table/build/slurm-%j.out
+#SBATCH --error=/scratch/user/u.jb337251/PRISMS-PF-3.0/applications/IceGM.table/build/slurm-%j.err
+#SBATCH --nodes=1
+#SBATCH --ntasks=16
+#SBATCH --time=12:00:00
+
+# Go directly into the build directory so PRISMS output files are written here.
+cd /scratch/user/u.jb337251/PRISMS-PF-3.0/applications/IceGM.table/build
+
+module purge
+module load foss/2023b CMake/3.27.6 VTK/9.3.0
+
+export DEAL_II_DIR=/scratch/user/u.jb337251/dealii-prisms-pf3-patched/lib/cmake/deal.II
+export LD_LIBRARY_PATH=/scratch/user/u.jb337251/dealii-prisms-pf3-patched/lib:$LD_LIBRARY_PATH
+
+echo "Running from:"
+pwd
+
+echo "Checking executable:"
+ls -lh ./main
+
+echo "Checking Deal.II link:"
+ldd ./main | grep "deal\|not found"
+
+echo "Starting simulation..."
+mpirun -np 16 ./main
